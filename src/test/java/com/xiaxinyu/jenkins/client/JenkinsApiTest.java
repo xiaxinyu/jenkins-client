@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StopWatch;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -25,8 +26,14 @@ public class JenkinsApiTest {
 
     @Test
     public void testCreateGroup() throws Exception {
-        JobWithDetails jobWithDetails = jenkinsApi.getJob("test");
-        Assert.assertNotNull(jobWithDetails);
-        log.info("remoteJobName={}", jobWithDetails.getDisplayName());
+        StopWatch stopWatch = new StopWatch("Starting query jenkins job");
+        for (int i = 0; i < 100; i++) {
+            stopWatch.start(String.format("Query jenkins job: sequence=%d", (i + 1)));
+            JobWithDetails jobWithDetails = jenkinsApi.getJob("cprtri-dl-example_example1_default_sonar");
+            Assert.assertNotNull(jobWithDetails);
+            log.info("remoteJobName={}", jobWithDetails.getDisplayName());
+            stopWatch.stop();
+        }
+        log.info("Finishing query jenkins job：{}", stopWatch.prettyPrint());
     }
 }
