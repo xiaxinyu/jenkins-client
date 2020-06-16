@@ -1,4 +1,4 @@
 jenkins:
-  address: http://10.201.109.80:10080/
-  username: root
-  token: FMrWX5sA9Q4xecgpUUsh
+  address: http://localhost:8080/
+  username: admin
+  token: 36296eee3aa42e8ca285d2697789aefc

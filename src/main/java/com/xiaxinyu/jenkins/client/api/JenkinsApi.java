@@ -41,7 +41,7 @@ public class JenkinsApi {
     @Autowired
     JenkinsHttpClientExtend clientExtend;
 
-    public  String toJenkinsFile(JSONObject json) {
+    public String toJenkinsFile(JSONObject json) {
         try {
 
             String url = "/pipeline-model-converter/toJenkinsfile";
@@ -159,33 +159,20 @@ public class JenkinsApi {
     }
 
 
-    public  JSONObject getJob(JSONObject job) throws Exception {
-        JobWithDetails jobDetails = getJobDetails(job.getString("remoteJobName"));
-        if (jobDetails == null) {
-            return null;
-        }
-
-        //返回最后一次构建的信息
-        BuildWithDetails buildDetail = jobDetails.getLastBuild().details();
-        JSONObject jobInfo = new JSONObject();
-
-        jobInfo.put("fullName", jobDetails.getFullName());
-        jobInfo.put("lastBuildTime", buildDetail.getTimestamp());
-        jobInfo.put("lastBuildResult", buildDetail.getResult());
-        jobInfo.put("lastBuildDisplayName", buildDetail.getDisplayName());
-
-        return jobInfo;
+    public JobWithDetails getJob(String remoteJobName) throws Exception {
+        JobWithDetails jobDetails = getJobDetails(remoteJobName);
+        return jobDetails;
     }
 
 
-    public  JobWithDetails getJobDetails(String remoteJobName) throws Exception {
+    public JobWithDetails getJobDetails(String remoteJobName) throws Exception {
 
         JobWithDetails jobDetails = jenkins.getJob(remoteJobName);
         return jobDetails;
     }
 
 
-    public  JSONObject runJob(String jobName, Map<String, String> map) {
+    public JSONObject runJob(String jobName, Map<String, String> map) {
         try {
             JobWithDetails jobDetails = getJobDetails(jobName);
 
@@ -221,7 +208,7 @@ public class JenkinsApi {
      * @throws IOException
      * @description 查看Job执行历史
      */
-    public  JSONArray getJobRunHis(String jobName, String runId) {
+    public JSONArray getJobRunHis(String jobName, String runId) {
         log.info("开始查询任务的运行历史：jobName={}，runId={}", jobName, runId);
         long start = System.currentTimeMillis();
         JSONArray hisArray = new JSONArray();
@@ -303,7 +290,7 @@ public class JenkinsApi {
     }
 
 
-    public  String getJobLastLog(String jobName) throws Exception {
+    public String getJobLastLog(String jobName) throws Exception {
 
         JobWithDetails jobDetails = jenkins.getJob(jobName);
 
@@ -316,7 +303,7 @@ public class JenkinsApi {
     }
 
 
-    public  JSONObject getJobLastRun(String jobName) {
+    public JSONObject getJobLastRun(String jobName) {
         try {
             JobWithDetails jobDetails = getJobDetails(jobName);
 
@@ -354,7 +341,7 @@ public class JenkinsApi {
     }
 
 
-    public  JSONObject getRunById(String jobName, String runId) throws Exception {
+    public JSONObject getRunById(String jobName, String runId) throws Exception {
         JSONArray runs = getJobRunHis(jobName, null);
         JSONObject temp = null;
         for (int i = 0; i < runs.size(); i++) {
@@ -366,7 +353,7 @@ public class JenkinsApi {
         throw new RuntimeException("获取jenkins运行记录失败，无效的runid:" + runId);
     }
 
-    public  String getRunLogById(String jobName, String runId) {
+    public String getRunLogById(String jobName, String runId) {
         try {
             JobWithDetails jobDetails = getJobDetails(jobName);
             List<Build> builds = jobDetails.getBuilds();
@@ -385,13 +372,13 @@ public class JenkinsApi {
     }
 
 
-    public  void disableJob(JSONObject job) throws Exception {
+    public void disableJob(JSONObject job) throws Exception {
 
         jenkins.disableJob(job.getString("remoteJobName"));
     }
 
 
-    public  void deleteJob(JSONObject job) {
+    public void deleteJob(JSONObject job) {
         try {
 
             jenkins.deleteJob(job.getString("remoteJobName"));
@@ -402,7 +389,7 @@ public class JenkinsApi {
     }
 
 
-    public  void deleteJob(String remoteJobName) throws Exception {
+    public void deleteJob(String remoteJobName) throws Exception {
         try {
             jenkins.deleteJob(remoteJobName);
         } catch (HttpResponseException ex) {
@@ -420,7 +407,7 @@ public class JenkinsApi {
      * @throws URISyntaxException
      * @description 下载归档文件
      */
-    public  InputStream downArtifact(JSONObject job) throws Exception {
+    public InputStream downArtifact(JSONObject job) throws Exception {
         String buildId = job.getString("buildId");
         String jobName = job.getString("remoteJobName");
 
@@ -444,7 +431,7 @@ public class JenkinsApi {
     }
 
 
-    public  String queryLog(String pipelinesName, Integer runId, Integer nodeId, String step) {
+    public String queryLog(String pipelinesName, Integer runId, Integer nodeId, String step) {
         try {
 
             String s = "blue/rest/organizations/jenkins/pipelines/" + pipelinesName + "/runs/" + runId + "/nodes/" + nodeId + "/steps/" + step + "/log/";
@@ -456,7 +443,7 @@ public class JenkinsApi {
         return null;
     }
 
-    public  String runStep(String pipelinesName, Integer runId) {
+    public String runStep(String pipelinesName, Integer runId) {
         try {
             String s = "/blue/rest/organizations/jenkins/pipelines/" + pipelinesName + "/runs/" + runId + "/";
             String reJson = clientExtend.getFormReturnContent(s);
@@ -467,7 +454,7 @@ public class JenkinsApi {
         return null;
     }
 
-    public  String nodesList(Integer runId, String pipelinesName, Integer limit) {
+    public String nodesList(Integer runId, String pipelinesName, Integer limit) {
         try {
             String s = "/blue/rest/organizations/jenkins/pipelines/" + pipelinesName + "/runs/" + runId + "/nodes/?limit=" + limit;
             String reJson = clientExtend.getFormReturnContent(s);
@@ -478,7 +465,7 @@ public class JenkinsApi {
         return null;
     }
 
-    public  String taskStatus(Integer runId, String pipelinesName) {
+    public String taskStatus(Integer runId, String pipelinesName) {
         try {
             String s = "blue/rest/organizations/jenkins/pipelines/" + pipelinesName + "/runs/" + runId + "/";
             String reJson = clientExtend.getFormReturnContent(s);
@@ -489,7 +476,7 @@ public class JenkinsApi {
         return null;
     }
 
-    public  String restartStep(Integer runId, String pipelinesName, Integer nodeId) {
+    public String restartStep(Integer runId, String pipelinesName, Integer nodeId) {
         try {
 
             String s = "blue/rest/organizations/jenkins/pipelines/" + pipelinesName + "/runs/" + runId + "/nodes/" + nodeId + "/restart/";
@@ -502,7 +489,7 @@ public class JenkinsApi {
     }
 
 
-    public  String validateJson(String json) {
+    public String validateJson(String json) {
         try {
             String s = "/pipeline-model-converter/validateJson";
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -515,7 +502,7 @@ public class JenkinsApi {
         return null;
     }
 
-    public  String querySteps(String pipelinesName, Integer runId, Integer nodeId) {
+    public String querySteps(String pipelinesName, Integer runId, Integer nodeId) {
         try {
             String s = "blue/rest/organizations/jenkins/pipelines/" + pipelinesName + "/runs/" + runId + "/nodes/" + nodeId + "/steps/";
             String reJson = clientExtend.getFormReturnContent(s);
@@ -526,8 +513,8 @@ public class JenkinsApi {
         return null;
     }
 
-    
-    public  String queryBuildLog(String remoteJobName, String runId) {
+
+    public String queryBuildLog(String remoteJobName, String runId) {
         try {
             String url = clientExtend.handleUrl(String.format("/job/%s/%s/logText/progressiveText?start=0", remoteJobName, runId));
             log.info("查询构建日志：remoteJobName= {}, runId={}, url={}", remoteJobName, runId, url);
@@ -538,7 +525,7 @@ public class JenkinsApi {
         }
     }
 
-    public  JSONObject querylogBySteps(String urls) {
+    public JSONObject querylogBySteps(String urls) {
         JSONObject jsonObject = new JSONObject();
 
         String url[] = urls.split(",");
@@ -575,14 +562,14 @@ public class JenkinsApi {
     }
 
 
-    public  void renameJob(String oldJobName, String newJobName) throws Exception {
+    public void renameJob(String oldJobName, String newJobName) throws Exception {
 
         if (jenkins.getJob(oldJobName) != null) {
             jenkins.renameJob(oldJobName, newJobName);
         }
     }
 
-    public  List<JSONObject> getJobRunningJobs() throws Exception {
+    public List<JSONObject> getJobRunningJobs() throws Exception {
         List<JSONObject> array = new ArrayList<>();
 
 
@@ -628,7 +615,7 @@ public class JenkinsApi {
         return array;
     }
 
-    public  void reloadJob(String remoteJobName) {
+    public void reloadJob(String remoteJobName) {
         try {
             String url = clientExtend.handleUrl(String.format("/job/%s/reload", remoteJobName));
             log.info("Reloading {} : {}", remoteJobName, url);
@@ -639,11 +626,11 @@ public class JenkinsApi {
         }
     }
 
-    private  String getJobNameFromUrl(String url) {
+    private String getJobNameFromUrl(String url) {
         return url.substring(url.indexOf("/job/") + 5, url.indexOf("/", url.indexOf("/job/") + 5));
     }
 
-    public  void abortJob(String jobName, String runId) throws Exception {
+    public void abortJob(String jobName, String runId) throws Exception {
         JSONArray runs = getJobRunHis(jobName, runId);
         if (runs.size() > 0) {
             JSONObject run = runs.getJSONObject(0);
@@ -663,8 +650,8 @@ public class JenkinsApi {
         }
     }
 
-    public  JSONObject checkTimeTrigger(String value) throws Exception {
-      
+    public JSONObject checkTimeTrigger(String value) throws Exception {
+
         //init 为Jenkins默认初始化内置项目，不得删除
         String url = clientExtend.handleUrl(String.format("/job/init/descriptorByName/hudson.triggers.TimerTrigger/checkSpec?value=%s", value));
         String response = clientExtend.get(url);
@@ -723,7 +710,7 @@ public class JenkinsApi {
         return result;
     }
 
-    public  String toPipelineJson(String jenkinsFile) throws Exception {
+    public String toPipelineJson(String jenkinsFile) throws Exception {
 
         String url = clientExtend.handleUrl("/pipeline-model-converter/toJson");
 
@@ -750,7 +737,7 @@ public class JenkinsApi {
         return returnResult;
     }
 
-    public  String loadEnvVars() {
+    public String loadEnvVars() {
         final String JENKINS_ENV_VARS_URL = "env-vars.html";
         try {
 

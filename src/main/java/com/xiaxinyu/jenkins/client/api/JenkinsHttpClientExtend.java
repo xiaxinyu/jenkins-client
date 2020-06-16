@@ -1,6 +1,5 @@
 package com.xiaxinyu.jenkins.client.api;
 
-import com.crc.devops.devcloud.common.exception.AppException;
 import com.offbytwo.jenkins.client.JenkinsHttpClient;
 import com.offbytwo.jenkins.client.util.RequestReleasingInputStream;
 import com.offbytwo.jenkins.client.util.ResponseUtils;
@@ -116,13 +115,13 @@ public class JenkinsHttpClientExtend extends JenkinsHttpClient {
             int statusCode = response.getStatusLine().getStatusCode();
             logger.debug("方法getFormReturnStatusCode的请求状态：{}", statusCode);
             if (statusCode >= HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-                throw new AppException(String.format("请求出现错误：StatusCode=%d, Reason=%s", statusCode, response.getStatusLine().getReasonPhrase()));
+                throw new RuntimeException(String.format("请求出现错误：StatusCode=%d, Reason=%s", statusCode, response.getStatusLine().getReasonPhrase()));
             }
             logger.debug("[getFormReturnStatusCode]关闭流操作前");
             EntityUtils.consume(response.getEntity());
             logger.debug("[getFormReturnStatusCode]关闭流操作后");
             return statusCode;
-        } catch (AppException e) {
+        } catch (RuntimeException e) {
             response.close();
             logger.error("发送Get请求发生异常: ", e);
             throw new AppletIOException(e.getMessage());
@@ -140,7 +139,7 @@ public class JenkinsHttpClientExtend extends JenkinsHttpClient {
             return response;
         } catch (Exception e) {
             logger.error("执行Jenkins查询报错", e);
-            throw new AppException(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -203,13 +202,13 @@ public class JenkinsHttpClientExtend extends JenkinsHttpClient {
             int statusCode = response.getStatusLine().getStatusCode();
             logger.info("方法postFormReturnStatusCode的请求状态：{}", statusCode);
             if (statusCode >= HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-                throw new AppException(String.format("请求出现错误：StatusCode=%d, Reason=%s", statusCode, response.getStatusLine().getReasonPhrase()));
+                throw new RuntimeException(String.format("请求出现错误：StatusCode=%d, Reason=%s", statusCode, response.getStatusLine().getReasonPhrase()));
             }
             logger.debug("[postFormReturnStatusCode]关闭流操作前");
             EntityUtils.consume(response.getEntity());
             logger.debug("[postFormReturnStatusCode]关闭流操作后");
             return statusCode;
-        } catch (AppException e) {
+        } catch (RuntimeException e) {
             response.close();
             logger.error("发送POST请求发生异常: ", e);
             throw new AppletIOException(e.getMessage());

@@ -2,10 +2,9 @@ package com.xiaxinyu.jenkins.client.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.crc.devops.devcloud.common.Constants;
-import com.crc.devops.devcloud.common.exception.AppException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaxinyu.jenkins.client.core.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,13 +151,13 @@ public class JSONUtils {
                 if (realCls.isAssignableFrom(cls)) {
                     return (T) value;
                 }
-                throw new AppException("属性(" + attrName + ")类型错误，期望的类型:" + cls.getName() + ",实际类型:" + realCls.getName());
+                throw new RuntimeException("属性(" + attrName + ")类型错误，期望的类型:" + cls.getName() + ",实际类型:" + realCls.getName());
             } else {
-                throw new AppException("属性(" + attrName + ")不存在!");
+                throw new RuntimeException("属性(" + attrName + ")不存在!");
             }
 
         } else {
-            throw new AppException("第一个参数obj不能为空!");
+            throw new RuntimeException("第一个参数obj不能为空!");
         }
     }
 
@@ -176,7 +175,7 @@ public class JSONUtils {
                 result = obj.get(attrName);
             }
         } else {
-            throw new AppException("第一个参数obj不能为空!");
+            throw new RuntimeException("第一个参数obj不能为空!");
         }
         return result;
     }
@@ -212,7 +211,7 @@ public class JSONUtils {
     public static void checkProperties(JSONObject obj, Object[] properties) {
         String msg = checkPropertiesRetMsg(obj, properties);
         if (msg != null && msg.length() > 0) {
-            throw new AppException(msg);
+            throw new RuntimeException(msg);
         }
     }
 
